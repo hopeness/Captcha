@@ -1,0 +1,4 @@
+Captcha
+=======
+
+A captcha class.
