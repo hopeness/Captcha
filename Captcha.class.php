@@ -4,7 +4,23 @@
  **/
 class Captcha {
 
+    /**
+     * 对象
+     */
     private $obj;
+
+    /**
+     * 颜色域
+     */
+    private $color = array(
+            array('bg' => array(70, 100, 100), 'font' => array(255, 255, 255)),
+            array('bg' => array(0, 0, 0), 'font' => array(255, 255, 255))
+        );
+
+    /**
+     * 字体路径
+     */
+    private $fontDir = dirname(__FILE__) . '/font/';
 
     public function __construct($width = 80, $height = 35, $fontSize = null, $overlap = 0.7, $angle = 30){
         $this->obj = new Captcha_GD($width, $height, $fontSize, $overlap, $angle);
@@ -105,6 +121,7 @@ class Captcha_GD {
     public function show($code){
         $this->code = $code;
         $this->codeCount = strlen($this->code);
+        // 如果字体大小没有被设置，则按照长宽和字符个数自动计算
         if($this->fontSize === null){
             $fontSize = $this->width / $this->codeCount;
             if($fontSize < $this->height){
@@ -117,7 +134,8 @@ class Captcha_GD {
         $this->image = imagecreate($this->width, $this->height);
         $this->bgColor = imagecolorallocate($this->image, 70, 100, 100);
         $this->fontColor = imagecolorallocate($this->image, 255, 255, 255);
-        $this->kuang = imagecolorallocate($this->image, 0, 0, 0);
+        // 调试情况下开启，计算字符边框
+        $this->border = imagecolorallocate($this->image, 0, 0, 0);
         $this->font = $this->randomFont();
 
         // 为每个字符单独设置旋转角度、大小等
@@ -125,8 +143,9 @@ class Captcha_GD {
         for($i=0; $i<$this->codeCount; $i++){
             $angle = rand($this->maxAngle, $this->minAngle);
             $ttfbbox = imagettfbbox($this->fontSize, $angle, $this->font, $this->code[$i]);
-            $x = $y = array();
+            
             // 计算图形在象限中的4个极值
+            $x = $y = array();
             for($j=0; $j<8; $j++){
                 if($j%2 == 0){
                     if(!isset($x['min']) || $ttfbbox[$j] < $x['min']){
@@ -157,21 +176,21 @@ class Captcha_GD {
                 $left = ($left + $width * $this->overlap);
             }
 
-            $kuang = imagettftext($this->image, $this->fontSize, $angle, $left, $top, $this->fontColor, $this->font, $this->code[$i]);
+            $border = imagettftext($this->image, $this->fontSize, $angle, $left, $top, $this->fontColor, $this->font, $this->code[$i]);
 
             // 调试信息
             // 字符坐标排查，插入自定义header
-            // header('X-test1: '.$angle.' | '.$width.' | '.$height.' | '.$left.' | '.$top.' |$| (x'.$kuang[0].' y'.$kuang[1].') | (x'.$kuang[2].' y'.$kuang[3].') | (x'.$kuang[4].' y'.$kuang[5].') | (x'.$kuang[6].' y'.$kuang[7].')');
+            // header('X-test1: '.$angle.' | '.$width.' | '.$height.' | '.$left.' | '.$top.' |$| (x'.$border[0].' y'.$border[1].') | (x'.$border[2].' y'.$border[3].') | (x'.$border[4].' y'.$border[5].') | (x'.$border[6].' y'.$border[7].')');
             // header('X-test2: '.$angle.' | '.$width.' | '.$height.' | '.$left.' | '.$top.' |$| (x'.$x['min'].' y'.$y['min'].') | (x'.$x['max'].' y'.$y['min'].') | (x'.$x['max'].' y'.$y['max'].') | (x'.$x['min'].' y'.$y['max'].')');
             // header('X-font: '.$this->font);
 
             // 字符位置辅助代码
-            // $x['min'] = $x['min'] + $left;
-            // $x['max'] = $x['max'] + $left;
-            // $y['min'] = $y['min'] + $top;
-            // $y['max'] = $y['max'] + $top;
-            // imagepolygon($this->image, $kuang, 4, $this->kuang);
-            // imagepolygon($this->image, array($x['min'], $y['min'], $x['max'], $y['min'], $x['max'], $y['max'], $x['min'], $y['max']), 4, $this->kuang);
+            $x['min'] = $x['min'] + $left;
+            $x['max'] = $x['max'] + $left;
+            $y['min'] = $y['min'] + $top;
+            $y['max'] = $y['max'] + $top;
+            imagepolygon($this->image, $border, 4, $this->border);
+            imagepolygon($this->image, array($x['min'], $y['min'], $x['max'], $y['min'], $x['max'], $y['max'], $x['min'], $y['max']), 4, $this->border);
         }
 
         header('Content-Type: image/png');
