@@ -12,15 +12,15 @@ class Captcha {
     /**
      * 颜色域
      */
-    private $color = array(
-            array('bg' => array(70, 100, 100), 'font' => array(255, 255, 255)),
-            array('bg' => array(0, 0, 0), 'font' => array(255, 255, 255))
-        );
+    // private $color = array(
+    //         array('bg' => array(70, 100, 100), 'font' => array(255, 255, 255)),
+    //         array('bg' => array(0, 0, 0), 'font' => array(255, 255, 255))
+    //     );
 
     /**
      * 字体路径
      */
-    private $fontDir = dirname(__FILE__) . '/font/';
+    // private $fontDir = dirname(__FILE__) . '/font/';
 
     public function __construct($width = 80, $height = 35, $fontSize = null, $overlap = 0.7, $angle = 30){
         $this->obj = new Captcha_GD($width, $height, $fontSize, $overlap, $angle);
