@@ -185,12 +185,12 @@ class Captcha_GD {
             // header('X-font: '.$this->font);
 
             // 字符位置辅助代码
-            $x['min'] = $x['min'] + $left;
-            $x['max'] = $x['max'] + $left;
-            $y['min'] = $y['min'] + $top;
-            $y['max'] = $y['max'] + $top;
-            imagepolygon($this->image, $border, 4, $this->border);
-            imagepolygon($this->image, array($x['min'], $y['min'], $x['max'], $y['min'], $x['max'], $y['max'], $x['min'], $y['max']), 4, $this->border);
+            // $x['min'] = $x['min'] + $left;
+            // $x['max'] = $x['max'] + $left;
+            // $y['min'] = $y['min'] + $top;
+            // $y['max'] = $y['max'] + $top;
+            // imagepolygon($this->image, $border, 4, $this->border);
+            // imagepolygon($this->image, array($x['min'], $y['min'], $x['max'], $y['min'], $x['max'], $y['max'], $x['min'], $y['max']), 4, $this->border);
         }
 
         header('Content-Type: image/png');
